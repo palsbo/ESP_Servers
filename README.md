@@ -4,6 +4,19 @@ General server libraries for Webserver and WebSocket.
 
 ##	Webserver library
 
+Uses the followng libraries for ESP8266:
+
+	ESP8266WebServer.h     included as part of ESP8266 hardware profile
+
+Uses the followng libraries for ESP32:
+
+	ESP32WebServer.h       https://github.com/chunter1/precipitationSensorESP32/blob/master/ESP32WebServer.h
+
+
+	ArduinoJson.h          https://github.com/bblanchon/ArduinoJson/blob/master/ArduinoJson.h
+	WebSocketsServer.h     https://github.com/brandenhall/Arduino-Websocket/blob/master/WebSocketServer.h
+
+
 ###	Include
 
 	#include <webserver.h>
@@ -23,7 +36,13 @@ General server libraries for Webserver and WebSocket.
 
 ##	WebSocket server library.
 
+Uses the followng libraries:
+
 The websocket expects to receive a JSON string. Each key in the JSON array will generate an 'on' event.
+
+	ArduinoJson.h          https://github.com/bblanchon/ArduinoJson/blob/master/ArduinoJson.h
+	WebSocketsServer.h     https://github.com/brandenhall/Arduino-Websocket/blob/master/WebSocketServer.h
+
 
 ###	Include
 

@@ -23,12 +23,12 @@ Uses the followng libraries for ESP32:
 
 ###	Methods
 
-  void begin();
-  void on(const char * page, onwebtype func);       //	func = [] () {};
-  void onarg(const char * topic, onargtype func);   //	func = [] (char * value) {};
-  void ifarg(const char * topic, onargtype func);   //  func = [] (char * value) {};
-  void send(int id, char * type, char * data);
-  void loop();
+	void begin();
+	void on(const char * page, onwebtype func);       //	func = [] () {};
+	void onarg(const char * topic, onargtype func);   //	func = [] (char * value) {};
+	void ifarg(const char * topic, onargtype func);   //  func = [] (char * value) {};
+	void send(int id, char * type, char * data);
+	void loop();
 
 ##	WebSocket server library.
 

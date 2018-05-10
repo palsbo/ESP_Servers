@@ -13,10 +13,6 @@ Uses the followng libraries for ESP32:
 	ESP32WebServer.h       https://github.com/chunter1/precipitationSensorESP32/blob/master/ESP32WebServer.h
 
 
-	ArduinoJson.h          https://github.com/bblanchon/ArduinoJson/blob/master/ArduinoJson.h
-	WebSocketsServer.h     https://github.com/brandenhall/Arduino-Websocket/blob/master/WebSocketServer.h
-
-
 ###	Include
 
 	#include <webserver.h>

@@ -12,7 +12,7 @@ class WEBSERVER {
   void begin();
   void on(const char * page, onwebtype func);
   void onarg(const char * topic, onargtype func);
-  void ifarg(const char * topic, onargtype cb);
+  void ifarg(const char * topic, onargtype func);
   void send(int id, char * type, char * data);
   void loop();
 };

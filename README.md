@@ -37,7 +37,7 @@ Uses the followng libraries:
 The websocket expects to receive a JSON string. Each key in the JSON array will generate an 'on' event.
 
 	ArduinoJson.h          https://github.com/bblanchon/ArduinoJson/blob/master/ArduinoJson.h
-	WebSocketsServer.h     https://github.com/brandenhall/Arduino-Websocket/blob/master/WebSocketServer.h
+	WebSocketsServer.h     https://github.com/brandenhall/Arduino-Websocket/
 
 
 ###	Include

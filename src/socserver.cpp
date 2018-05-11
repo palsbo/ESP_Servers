@@ -10,27 +10,20 @@
 
 WebSocketsServer * sserver;
 
-int oncount = 0;
-
-struct ON {
-  String id;
-  streamtype func;
-} ons[10];
-
-void add(String id, streamtype func) {
-  for (int i = 0; i < oncount; i++) {
+void WSSONS::add(String id, streamtype func) {
+  for (int i = 0; i < count; i++) {
     if (ons[i].id == id) {
       ons[i].func = func;
       return;
     }
   }
-  ons[oncount].id = id;
-  ons[oncount].func = func;
-  oncount++;
+  if (count >= MAXONS) return;
+  ons[count].id = id;
+  ons[count].func = func;
+  count++;
 }
-
-void lookup (String id, uint8_t num, char * data) {
-  for (int i = 0; i < oncount; i++) {
+void WSSONS::lookup (String id, uint8_t num, char * data) {
+  for (int i = 0; i < count; i++) {
     if (id == ons[i].id) {
       ons[i].func(num, data);
       return;
@@ -38,12 +31,14 @@ void lookup (String id, uint8_t num, char * data) {
   }
 }
 
+WSSONS wssons;
+
 static void ondata(uint8_t num, char * data) {
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(data);
   for (auto field : root) {
     String value = root[field.key];
-    lookup(field.key, num, (char*)value.c_str());
+    wssons.lookup(field.key, num, (char*)value.c_str());
   }
 };
 
@@ -56,18 +51,18 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
   s1[length] = 0;
   switch (type) {
     case WStype_DISCONNECTED:
-      lookup("disconnect", num, &s1[0]);
+      wssons.lookup("disconnect", num, &s1[0]);
       break;
     case WStype_CONNECTED: {
-      Serial.println("Connecting");
-        lookup("connect", num, &s1[0]);
+        Serial.println("Connecting");
+        wssons.lookup("connect", num, &s1[0]);
       }
       break;
     case WStype_TEXT:
       if (data == "__ping__") {
         sserver->sendTXT(num, "__pong__");
       } else {
-        lookup("data", num, &s1[0]);
+        wssons.lookup("data", num, &s1[0]);
       }
       break;
     case WStype_BIN:
@@ -97,7 +92,7 @@ void SOCSERVER::begin() {
 };
 
 void SOCSERVER::on(char * id, streamtype func) {
-  add(id, func);
+  wssons.add(id, func);
 }
 
 void SOCSERVER::broadcast(String data) {

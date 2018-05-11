@@ -4,6 +4,32 @@
 typedef void (*onwebtype)();
 typedef void (*onargtype)(char * value);
 
+#define MAXONS  10
+
+class ONWEB {
+  private:
+    struct {
+      String page;
+      onwebtype func;
+    } webs[MAXONS];
+    int count = 0;
+  public:
+    void add(const char * page, onwebtype func);
+    bool lookup(String uri);
+};
+
+class ONARG {
+  private:
+    int count = 0;
+    struct {
+      const char * arg;
+      onargtype func;
+    } args[MAXONS];
+  public:
+    bool lookup (String arg, char * data);
+    void add(const char * arg, onargtype func);
+};
+
 class WEBSERVER {
   private:
     static void handlenotfound();

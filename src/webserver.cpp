@@ -12,50 +12,65 @@ ESP8266WebServer * wserver;
 #else
 ESP32WebServer * wserver;
 #endif
-int onwebcount = 0;
-int onargcount = 0;
 
-struct onwebstruct {
-  String page;
-  onwebtype func;
-};
+void ONWEB::add(const char * page, onwebtype func) {
+  for (int i = 0; i < count; i++) {
+    if (webs[i].page == page) {
+      webs[i].func = func;
+      return;
+    }
+  }
+  if (count == MAXONS) return;
+  webs[count].page = page;
+  webs[count].func = func;
+  count++;
+}
 
-struct onargstruct {
-  const char * arg;
-  onargtype func;
-};
-
-onwebstruct onwebs[MAXONS];
-onargstruct onargs[MAXONS];
-
-bool weblookup(String uri) {
-  for (int i = 0; i < onwebcount; i++) {
-    if (uri == onwebs[i].page) {
-      onwebs[i].func();
+bool ONWEB::lookup(String uri) {
+  for (int i = 0; i < count; i++) {
+    if (uri == webs[i].page) {
+      webs[i].func();
       return true;
     }
   }
   return false;
 }
 
-bool arglookup (String arg, char * data) {
-  for (int i = 0; i < onargcount; i++) {
-    if (arg == onargs[i].arg) {
-      onargs[i].func(data);
+ONWEB onweb;
+
+bool ONARG::lookup (String arg, char * data) {
+  for (int i = 0; i < count; i++) {
+    if (arg == args[i].arg) {
+      args[i].func(data);
       return true;
     }
   }
   return false;
 }
+
+void ONARG::add(const char * arg, onargtype func) {
+  for (int i = 0; i < count; i++) {
+    if (args[i].arg == arg) {
+      args[i].func = func;
+      return;
+    }
+  }
+  if (count == MAXONS) return;
+  args[count].arg = arg;
+  args[count].func = func;
+  count++;
+}
+
+ONARG onargs;
 
 void WEBSERVER::handlenotfound() {
   for (uint8_t i = 0; i < wserver->args(); i++) {
     String val = wserver->arg(i);
-    if (arglookup(wserver->argName(i), &val[0])) {
+    if (onargs.lookup(wserver->argName(i), &val[0])) {
       break;
     }
   }
-  if (weblookup(wserver->uri())) return;
+  if (onweb.lookup(wserver->uri())) return;
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += wserver->uri();
@@ -84,29 +99,11 @@ void WEBSERVER::begin() {
 }
 
 void WEBSERVER::on(const char * page, onwebtype func) {
-  for (int i = 0; i < onwebcount; i++) {
-    if (onwebs[i].page == page) {
-      onwebs[i].func = func;
-      return;
-    }
-  }
-  if (onwebcount == MAXONS) return;
-  onwebs[onwebcount].page = page;
-  onwebs[onwebcount].func = func;
-  onwebcount++;
+  onweb.add(page, func);
 }
 
 void WEBSERVER::onarg(const char * arg, onargtype func) {
-  for (int i = 0; i < onargcount; i++) {
-    if (onargs[i].arg == arg) {
-      onargs[i].func = func;
-      return;
-    }
-  }
-  if (onargcount == MAXONS) return;
-  onargs[onargcount].arg = arg;
-  onargs[onargcount].func = func;
-  onargcount++;
+  onargs.add(arg, func);
 }
 void WEBSERVER::ifarg(const char * topic, onargtype func) {
   String val = (wserver->arg(topic));
@@ -114,7 +111,7 @@ void WEBSERVER::ifarg(const char * topic, onargtype func) {
 };
 
 void WEBSERVER::send(int id, char * type, char * data) {
- wserver->send(id, type, data);
+  wserver->send(id, type, data);
 }
 
 void WEBSERVER::loop() {

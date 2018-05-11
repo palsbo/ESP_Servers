@@ -4,6 +4,20 @@
 
 typedef void (*streamtype)(uint8_t num, char * data);
 
+#define MAXONS  15
+
+class WSSONS {
+  private:
+    struct ON {
+      String id;
+      streamtype func;
+    } ons[MAXONS];
+    int count = 0;
+  public:
+    void add(String id, streamtype func);
+    void lookup (String id, uint8_t num, char * data);
+};
+
 class SOCSERVER {
   private:
   public:

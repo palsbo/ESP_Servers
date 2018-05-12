@@ -14,7 +14,7 @@ Uses the followng libraries for ESP8266:
 
 Uses the followng libraries for ESP32:
 
-	ESP32WebServer.h       https://github.com/chunter1/precipitationSensorESP32/blob/master/ESP32WebServer.h
+	ESP32WebServer.h       https://github.com/Pedroalbuquerque/ESP32WebServer
 
 
 ###	Include

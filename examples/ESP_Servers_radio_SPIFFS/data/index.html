@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Webradio</title>
+    <meta name="viewport" content="width=device-width">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="simple-slider.min.js"></script>
+    <link href="simple-slider.css" rel="stylesheet" type="text/css" />
+    <!--
+        Using the module 'wssocket.js' gives auto-connect if server disconnect.
+        register the websocket object as this:
+        const ws = new WEBSOCKET(url)
+    -->
+    <script src="wssocket.js"></script>
+    <script type="text/javascript">
+        var currentUrl;
+        
+        function selecting(obj) {
+            var ar = { 'url': obj.value };
+            if (sock) sock.send(JSON.stringify(ar));
+        }
+
+        function gotMessage(data) {
+          var ar = JSON.parse(data);
+          for (id in ar) {
+              switch (id) {
+                  case 'gain':
+                      $("[data-slider]").simpleSlider("setValue", ar.gain/100);
+                      break;
+                  case 'url':
+                      currentUrl = ar.url;
+                      $("#prog").val(ar.url);
+                      $("#aud").attr("src", ar.url).trigger("play");
+                      break;
+                  case 'bitrate':
+                      $("#bitrate").html(ar['bitrate']);
+                      break;
+                  case 'genre':
+                      $("#genre").html(ar['genre']);
+                      break;
+                  case 'name':
+                      $("#name").html(ar['name']);
+                      break;
+                  case 'title':
+                      $("#title").html(ar.title);
+                      break;
+              }
+          }
+        }
+
+        function gotStatus(status) {
+            if (status) {
+                document.getElementById("line").style.backgroundColor = "green";
+                document.getElementById("line").innerText = "Online";
+            } else {
+                document.getElementById("line").style.backgroundColor = "red";
+                document.getElementById("line").innerText = "Offline";
+            }
+        }
+
+        var sock = new SOCK('ws://'+location.hostname +':81', gotMessage, gotStatus);
+        $(function () {
+            document.getElementById("aud").addEventListener('volumechange', function () {
+                console.log('changed.', Math.round(this.volume * 100));
+            }, false);
+            $("#vol").bind("slider:ready slider:changed", function (event, data) {
+                    var ar = {};
+                    ar['gain'] = Math.round(data.value * 100);
+                    if (sock) sock.send(JSON.stringify(ar));
+                });
+
+            sock.connect();
+        });
+    </script>
+</head>
+<body>
+    <div style="margin:auto;width:320px">
+        <button id="line" style="float:right;background-color:red;color:white">Offline</button>
+        <h1>Webradio</h1>
+        <h4>Client volume</h4>
+        <input id="vol" style="width:100%" type="text" data-slider="true" value="0.8" data-slider-highlight="true">
+        <audio id="aud" style="width:100%" src="http://live-icy.gss.dr.dk:80/A/A07H.mp3" controls preload></audio><br />
+        <div style="margin-bottom:10px" id="info"></div>
+        <select style="width:100%;font-size:larger" onchange="selecting(this)" id="prog">
+            <option value="">select station</option>
+            <option value="http://streaming.shoutcast.com/80sPlanet?lang=eng-US">80' Planet</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A02H.mp3">DR Nyheder</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A03H.mp3">DR P1</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A04H.mp3">DR P2 Klassisk</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A05H.mp3">DR P3</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A06H.mp3">DR P4 Bornholm</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A15H.mp3">DR P4 Esbjerg</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A07H.mp3">DR P4 Fyn</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A08H.mp3">DR P4 København</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A09H.mp3">DR P4 Midt & Vest</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A10H.mp3">DR P4 Nordjylland</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A11H.mp3">DR P4 Sjælland</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A12H.mp3">DR P4 Syd</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A13H.mp3">DR P4 Trekanten</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A14H.mp3">DR P4 Østjylland</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A25H.mp3">DR P5</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A29H.mp3">DR P6 Beat</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A21H.mp3">DR P7 Mix</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A22H.mp3">DR P8 Jazz</option>
+            <option value="http://live-icy.gss.dr.dk:8000/A/A24H.mp3">DR Ramasjang/Ultra</option>
+            <option value="http://onair.100fmlive.dk:80/klassisk_live.mp3">Klassisk Live</option>
+            <option value="http://stream.novafm.dk:80/nova128">Nova FM</option>
+            <option value="http://stream.popfm.dk:80/pop128">Pop FM</option>
+            <option value="http://onair.100fmlive.dk:80/100fm_live.mp3">Radio 100 FM</option>
+            <option value="http://195.184.101.203/voice128">The Voice</option>
+            <option value="http://streammp3.retro-radio.dk/retro-mp3?type=.mp3">Retro-radio</option>
+            <option value="http://tx-2.retro-radio.dk/TX-2?type=.mp3">Retro Millenium</option>
+        </select>
+        <table style="width:100%">
+            <tr><td style="vertical-align:top;font-weight:bold">Title:</td><td id="title"></td></tr>
+        </table>
+        <table style="width:100%">
+            <tr>
+                <td style="vertical-align:top;font-weight:bold">Station:</td>
+                <td style="vertical-align:top;font-weight:bold">Genre:</td>
+                <td style="vertical-align:top;font-weight:bold">Bitrate::</td>
+            </tr>
+            <tr>
+                <td id="name"></td>
+                <td id="genre"></td>
+                <td id="bitrate"></td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

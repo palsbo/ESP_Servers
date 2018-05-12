@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>RGB LED Control</title>
+    <script src="jscolor.min.js"></script>
+    <script src="wssocket.js"></script>
+    <script type="text/javascript">
+        var objR, objG, objB;
+        function gotMessage(data) {
+            setRGB(JSON.parse(data));
+        }
+
+        function gotStatus(status) {
+            if (status) {
+                document.getElementById("line").style.backgroundColor = "green";
+                document.getElementById("line").innerText = "Online";
+            } else {
+                document.getElementById("line").style.backgroundColor = "red";
+                document.getElementById("line").innerText = "Offline";
+            }
+        }
+
+        var sock = new SOCK('ws://'+location.hostname +':81', gotMessage, gotStatus);
+        //var sock = new SOCK('ws://192.168.1.188:81', gotMessage, gotStatus);
+        sock.debug = false;
+        var cp;
+
+        function setRGB(data) {
+            if (typeof (data.R) != 'undefined') document.getElementById('r').value = data.R;
+            if (typeof (data.G) != 'undefined') document.getElementById('g').value = data.G;
+            if (typeof (data.B) != 'undefined') document.getElementById('b').value = data.B;
+            cp.fromString(("0" + parseInt(objR.value).toString(16)).substr(-2) + ("0" + parseInt(objG.value).toString(16)).substr(-2) + ("0" + parseInt(objB.value).toString(16)).substr(-2))
+        }
+
+        function sendRGB() {
+            var data = {
+                'R': parseInt(document.getElementById('r').value),
+                'G': parseInt(document.getElementById('g').value),
+                'B': parseInt(document.getElementById('b').value)
+            };
+            sock.send(JSON.stringify(data));
+        }
+
+        function update() {
+            document.getElementById('r').value = cp.rgb[0];
+            document.getElementById('g').value = cp.rgb[1];
+            document.getElementById('b').value = cp.rgb[2];
+            sendRGB();
+        }
+
+        function start() {
+            objR = document.getElementById('r');
+            objG = document.getElementById('g');
+            objB = document.getElementById('b');
+            cp = new jscolor("block", { valueElement: "block" })
+            cp.onFineChange = "update()";
+            document.body.onmouseup = function (event) {
+                if (event.srcElement.tagName == 'DIV') cp.hide();
+            }
+            sock.connect();
+        }
+    </script>
+</head>
+
+<body onload="start()">
+    <button id="line" style="float:right;background-color:red;color:white">Offline</button>
+    <h1>LED Control:</h1>
+    <table>
+        <tr>
+            <td>
+                R: <input id="r" type="range" min="0" max="255" step="1" oninput="sendRGB();" /><br />
+                G: <input id="g" type="range" min="0" max="255" step="1" oninput="sendRGB();" /><br />
+                B: <input id="b" type="range" min="0" max="255" step="1" oninput="sendRGB();" /><br />
+            </td>
+            <td id="block" style="width:200px;vertical-align:middle; text-align:center"></td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -32,6 +32,8 @@ class ONARG {
 
 class WEBSERVER {
   private:
+    static String getContentType(String filename);
+    static bool handleFileRead(String path);
     static void handlenotfound();
   public:
   WEBSERVER(int port);

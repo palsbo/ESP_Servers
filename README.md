@@ -4,6 +4,10 @@ General server libraries for Webserver and WebSocket.
 
 ##	Webserver library
 
+The library will first look for arguments and return values with handlers defined in 'onarg'.
+Nex it will look for uri pages and transmit defined pages with handlers defined in 'on'.
+If a handler is not defined for an uri pages, the librafy will look in the SPIFFS for the file.
+
 Uses the followng libraries for ESP8266:
 
 	ESP8266WebServer.h     included as part of ESP8266 hardware profile
